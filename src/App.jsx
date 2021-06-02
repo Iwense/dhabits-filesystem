@@ -27,12 +27,17 @@ const App = () => {
                     />
                 ))}
             </main>
-            <section>
-                <pre>
-                    {VERSION} 
-                    {COMMITHASH}
-                    {BRANCH}
-                </pre>
+            <section className={'extract'}>
+                <h3>Extract webpack config functional : </h3>
+                <div>
+                    <p>git version  - {VERSION} </p>
+                </div>
+                <div>
+                    <p>commit hash  -  {COMMITHASH} </p>
+                </div>
+                <div>
+                    <p>git branch  -   {BRANCH} </p>
+                </div>
             </section>
         </div>
     )
