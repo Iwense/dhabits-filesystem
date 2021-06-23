@@ -9,13 +9,71 @@ body {
 }
 .app {
 }
+.modal__wrapper {
+    position: absolute;
+    width: 100%;
+    min-height: 100vh;
+    background: rgba(10, 10, 10, 0.705);
+}
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 300px;
+    height: "fit-content";
+    background: #fff;
+    border-radius: 4px;
+}
+.modal__inner {
+    max-width: 500px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+.modal__input {
+    padding: 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    border: 0;
+    border-bottom: 1px solid #aca8a862;
+    outline: none;
+}
+.modal__button {
+    padding: 8px 16px;
+    font-size: 14px;
+    width: fit-content;
+    background: #686868;
+    border: 0;
+    border-radius: 4px;
+    color: rgb(231, 231, 231);
+    cursor: pointer;
+    margin-top: 12px;
+}
+.modal__button:hover {
+    background: #918f8f;
+}
 .header {
     background: cadetblue;
     padding: 20px;
+    display: flex;
+    justify-content: space-between;
 }
 .header__text {
     font-size: 30px;
     color: #fff;
+}
+.header__button {
+    padding: 4px 12px;
+    background: rgb(35, 92, 94);
+    border: 0;
+    color: rgb(231, 231, 231);
+    font-weight: 800;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.header__button:hover {
+    background: rgb(46, 118, 121);
 }
 .main {
     background: #fff;

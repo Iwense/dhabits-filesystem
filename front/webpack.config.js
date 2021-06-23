@@ -30,9 +30,9 @@ module.exports = {
         new CleanWebpackPlugin(),
         gitRevisionPlugin,
         new webpack.DefinePlugin({
-            'VERSION': JSON.stringify(gitRevisionPlugin.version()),
-            'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
-            'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
+            __VERSION__: JSON.stringify(gitRevisionPlugin.version()),
+            __COMMITHASH__: JSON.stringify(gitRevisionPlugin.commithash()),
+            __BRANCH__: JSON.stringify(gitRevisionPlugin.branch()),
         }),
     ],
     module: {

@@ -4,7 +4,7 @@ import path from 'path';
 const mainPath = './filesystem/';
 const fileSystem = {
     children: [],
-    id: 0,
+    id: 1,
     title:"root",
 }
 
@@ -16,16 +16,15 @@ const createFileSystem = (inputFolder) => {
         const dirContent = path.resolve(inputFolder, file);
         if (fs.statSync(dirContent).isDirectory()) {
             const newDir = {
-                id: Date.now().toString(),
+                id: Date.now() + Math.floor(Math.random() * 10),
                 title: file,
                 children: [...createFileSystem(dirContent)]
             }
-            console.log("NewDir = ", newDir)
             result.push(newDir)
         }
         if (fs.statSync(dirContent).isFile()) {
             const newFile = {
-                id: Date.now().toString(),
+                id: Date.now() + Math.floor(Math.random() * 10),
                 title: file,
             }
             result.push(newFile)
@@ -34,31 +33,6 @@ const createFileSystem = (inputFolder) => {
 
     return result
 }
-console.log("everu time")
-fileSystem.children.push(...createFileSystem(mainPath))
-
-
-
-
-// const fileSystem = {
-//     children: [
-//         {id: 1, title: 'Site', children: [
-//             {id: 2123, title: 'index.js'},
-//             {id: 3123, title: 'style.css'},
-//             {id: 1111, title: 'Site', children: [
-//                 {id: 22123, title: 'index.js'},
-//                 {id: 31323, title: 'style.css'},
-//             ]},
-//         ]},
-//         {id: 2, title: 'Web', children: [
-//             {id: 2123, title: 'index.js'},
-//             {id: 3123, title: 'style.css'},
-//             {id: 15654, title: 'Empty', children: []}
-//         ]},
-//     ],
-//     id: 0,
-//     title:"root"
-// }
 
 const findID = (array = [], id) => {
     let result;
@@ -66,13 +40,12 @@ const findID = (array = [], id) => {
     return result;
   };
 
-export const getRoot = (req, res) => {
-    res.status(200).json(fileSystem)
+export const getRoot = async (req, res) => {
+    fileSystem.children = await createFileSystem(mainPath)
+    res.status(200).json(await fileSystem)
 }
 
 export const getFolders = (req, res) => {
-    console.log("Filesystem in Get Folders = ", fileSystem)
-    const newResponse = findID(fileSystem.children, req.params.id)
-    console.log("newResponse = ", newResponse)
+    const newResponse = findID(fileSystem.children, +req.params.id)
     res.status(200).json(newResponse)   
 }
