@@ -39,6 +39,7 @@ body {
     margin-right: 4px;
     width: 30px;
     height: 30px;
+    fill: "#000";
 }
 .subfolder {
     margin-left: 40px;

@@ -13,7 +13,7 @@ const filename = () => isDev ? 'bundle.js' : 'bundle.[hash].js'
 
 module.exports = {
     mode: 'development',
-    entry: ['@babel/polyfill','./src/index.jsx'],
+    entry: ['@babel/polyfill','./src/index.tsx'],
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: filename(),
@@ -42,36 +42,36 @@ module.exports = {
                 use: ["style-loader", 'css-loader']
             },
             {
-                test: /\.(jpg|jpeg|svg|png)$/i,
+                test: /\.svg$/,
+                exclude: /node_modules/,
+                use: "svg-react-loader"
+            },
+            {
+                test: /\.(jpg|jpeg|png)$/i,
                 use: ["file-loader"]
             },
+            
             {
-                test: /\.js$/,
+                test: /\.ts$/,
                 exclude: /node_modules/,
-                use: [
-                    {
-                        loader : "babel-loader",
-                        options: { 
-                            presets: ["@babel/preset-env"]
-                        }
-                    }
-                ]
+                use: 'ts-loader',
+
             },
             {
-                test: /\.jsx$/,
+                test: /\.tsx$/,
                 exclude: /node_modules/,
-                use: [
-                    {
-                        loader : "babel-loader",
-                        options: { 
-                            presets: ["@babel/preset-react","@babel/preset-env"]
-                        }
-                    }
-                ]
+                use: 'ts-loader',
             },
-        ]
+        ]                // [
+            //     {
+            //         loader : "ts-loader",
+            //         options: { 
+            //             presets: ["@babel/preset-react","@babel/preset-env"]
+            //         }
+            //     }
+            // ]
     },
     resolve: {
-        extensions: ['', '.js', '.jsx'],
+        extensions: ['', '.js', '.jsx', '.ts', '.tsx'],
       }
 }

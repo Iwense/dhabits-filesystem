@@ -1,0 +1,8 @@
+{
+    "plugins": [
+        "inline-react-svg"
+        // "@babel/preset-env",
+        // "@babel/preset-react",
+        // "@babel/syntax-dynamic-import"
+    ]
+}
