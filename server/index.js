@@ -1,17 +1,25 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import serverRoutes from './routes/api.js'
+import authRoutes from './routes/auth.js'
 import cors from 'cors';
+import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
+dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
-const DB_URL = 'mongodb+srv://user:user@cluster0.o7q6q.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+
 
 app.use(express.json())
-// app.use(cors())
 app.use(express.urlencoded({extended: true}))
-app.use(serverRoutes)
 app.use(cors({origin: false}))
+app.use(cookieParser())
+
+//Routes
+app.use(serverRoutes)
+app.use(authRoutes)
+
 
 app.post('/', (req,res)=> {
     console.log(req.body)
@@ -25,7 +33,7 @@ app.get('/', (req,res)=> {
 
 async function start () {
     try{
-        await mongoose.connect(DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
+        await mongoose.connect(process.env.DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
         app.listen(PORT, () => console.log("SERVER WORKING ON PORT ", PORT))
     }catch(e){
         console.log(e)

@@ -11,6 +11,7 @@ const App = () => {
     const [password, setPassword] = useState<string>("");
 
     useEffect(() => {
+        console.log("Go to /api/filesystem/");
         axios
             .get("http://localhost:5000/api/filesystem")
             .then(({ data }) => setFolders(data?.children));

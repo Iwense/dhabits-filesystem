@@ -41,11 +41,13 @@ const findID = (array = [], id) => {
   };
 
 export const getRoot = async (req, res) => {
+    console.log("/api/filesystem methods: getRoot")
     fileSystem.children = await createFileSystem(mainPath)
     res.status(200).json(await fileSystem)
 }
 
 export const getFolders = (req, res) => {
+    console.log("FileSystem = ", fileSystem)
     const newResponse = findID(fileSystem.children, +req.params.id)
     res.status(200).json(newResponse)   
 }
