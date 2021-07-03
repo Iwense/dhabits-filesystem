@@ -1,89 +1,152 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Folder from "./components/Folder";
 import File from "./components/File";
+import SignInModal from "./components/SignInModal";
+import SignUpModal from "./components/SignUpModal";
+import Alert, { IAlertItem } from "./components/Alert";
+import cookie from "./services/cookieService";
 
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getRootFolder } from "./app/features/filesystem/filesystem.js";
+// import { getUser } from "./app/features/auth/auth.js";
+import { getRoot } from "./app/features/filesystem/filesystemAsync";
+import { signUp, userLogin } from "./app/features/auth/authAsync";
+
+
+
+export interface ISubmitObject { 
+    login: string;
+    password:string;
+}
+
+const alertsList:Array<IAlertItem> = [{
+    status:'ok',
+    text:'asd',
+}]
 
 const App = () => {
-    const [folders, setFolders] = useState([]);
+    // const [folders, setFolders] = useState([]);
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [login, setLogin] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [showSignUpModal, setShowSignUpModal ] = useState<boolean>(false)
+    const folders = useSelector(getRootFolder)
+    // const user =useSelector(getUser) 
+    const user = 'me'
+    const dispatch = useDispatch()
+    const userAccessToken = cookie.get('accessToken')
+    const [alert, setAlert] = useState<boolean>(false)
 
-    useEffect(() => {
-        console.log("Go to /api/filesystem/");
-        axios
-            .get("http://localhost:5000/api/filesystem")
-            .then(({ data }) => setFolders(data?.children));
-    }, []);
+    console.log("alertsList" , alertsList)
+
+    const fetch = useCallback(()=> {
+        dispatch(getRoot())
+    }, [dispatch])
+
+    useEffect(()=> {
+        // TODO : remove this 
+        cookie.set('accessToken', 'asdasdasd')
+        if(!folders.length) {
+            fetch()
+        }
+    }, [folders, fetch])
 
     const handleEnterClick = () => {
         setShowModal((prev) => !prev);
     };
 
-    const handleSubmitModal = () => {
+    const handleEnterSignUpClick =()=> {
+        setShowSignUpModal(prev => !prev)
+    }
+
+    const handleSubmitLoginModal = ({login, password}: ISubmitObject) => {
         setShowModal(false);
+        //TODO : Check how to give throw parameters
+        dispatch(userLogin())
+        console.log('Login: ', login)
+        console.log('password', password)
     };
 
+    useEffect(() => {
+        if(!alert) return 
+        const alertShowTime = setTimeout(() => {
+            setAlert(false)
+            alertsList.shift()
+        }, 4000)
+    }, [alert, alertsList.length])
+
+    const handleSubmitSignUpModal = ({login, password}: ISubmitObject) => {
+        // setShowSignUpModal(false);
+        //TODO
+        // dispatch(signUp())
+        console.log('Login: ', login)
+        console.log('password', password)
+        alertsList.push({ 
+            status: 'ok',
+            text: `Пользователь ${login} успешно создан!`}
+        )
+        setAlert(true)
+    };
+
+
+    const handleSwitchModal = () => {
+        setShowModal(false);
+        setShowSignUpModal(true)
+    };
+    
     return (
         <div className='app'>
+            {alert && <Alert list={alertsList}/>}
             {showModal && (
-                <div className={"modal__wrapper"} onClick={handleEnterClick}>
-                    <div
-                        className={"modal"}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <form className={"modal__inner"}>
-                            <input
-                                type={"text"}
-                                value={login}
-                                onChange={(e) => setLogin(e.target.value)}
-                                placeholder={"Введите логин"}
-                                className={"modal__input"}
-                            />
-                            <input
-                                type={"password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder={"Введите пароль"}
-                                className={"modal__input"}
-                            />
-                            <input
-                                type='button'
-                                value={"Войти"}
-                                className={"modal__button"}
-                                onClick={handleSubmitModal}
-                            />
-                        </form>
-                    </div>
-                </div>
+               <SignInModal onEnterClick={handleEnterClick} onSubmit={(user:ISubmitObject) => handleSubmitLoginModal(user)} onModalLinkClick={handleSwitchModal}/>
+            )}
+            {showSignUpModal && (
+                <SignUpModal onEnterClick={handleEnterSignUpClick}  onSubmit={(user:ISubmitObject) => handleSubmitSignUpModal(user)}/>
             )}
             <header className='header'>
                 <h1 className='header__text'>Test for D-Habits</h1>
-                <button className='header__button' onClick={handleEnterClick}>
-                    Войти
-                </button>
+                {user && userAccessToken && (
+                    <div>
+                        <h3>{user}</h3>
+                    </div>
+                )}
+                 <button className='header__button' onClick={handleEnterClick}>
+                     Войти
+                    </button>
+                {!user && !userAccessToken && (
+                    <button className='header__button' onClick={handleEnterClick}>
+                     Войти
+                    </button>
+                )}
+                
             </header>
-            <main className='main'>
-                {!!folders.length &&
-                    folders.map((item, index) => {
-                        if (item.hasOwnProperty("children")) {
-                            return (
-                                <Folder
-                                    key={`Folders-${item?.id} - ${index}`}
-                                    title={item?.title}
-                                    id={item?.id}
-                                />
-                            );
-                        }
-                        return (
-                            <File
-                                key={`file-${item?.id} - ${index}`}
-                                title={item?.title}
-                            />
-                        );
-                    })}
-            </main>
+            {userAccessToken && (
+                 <main className='main'>
+                 {!!folders.length &&
+                     folders.map((item:any, index:number) => {
+                         if (item.hasOwnProperty("children")) {
+                             return (
+                                 <Folder
+                                     key={`Folders-${item?.id} - ${index}`}
+                                     title={item?.title}
+                                     id={item?.id}
+                                 />
+                             );
+                         }
+                         return (
+                             <File
+                                 key={`file-${item?.id} - ${index}`}
+                                 title={item?.title}
+                             />
+                         );
+                     })}
+                </main>
+            )}
+
+            {!userAccessToken && (
+                 <section className={"extract"}>
+                    <h3>ВЫ не вошли в систему, чтобы увидеть файловую структуру войдите в свой профиль</h3>
+                </section>
+            )}
+           
             <section className={"extract"}>
                 {/* <h3>Extract webpack config functional : </h3>
                 <div>

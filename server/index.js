@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-app.use(cors({origin: false}))
+app.use(cors())
 app.use(cookieParser())
 
 //Routes
@@ -33,7 +33,7 @@ app.get('/', (req,res)=> {
 
 async function start () {
     try{
-        await mongoose.connect(process.env.DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
+        // await mongoose.connect(process.env.DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
         app.listen(PORT, () => console.log("SERVER WORKING ON PORT ", PORT))
     }catch(e){
         console.log(e)
