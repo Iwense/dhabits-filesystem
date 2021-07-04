@@ -14,11 +14,10 @@ class UserService {
         const tokens = TokenService.generateTokens(user._id, user.username)
         await TokenService.saveToken(user._id, tokens.refreshToken)
 
-        return { ...tokens, user: user.username}
+        return { ...tokens, username: user.username}
     }
 
     async login(username, password){
-
         const user = await User.findOne({username})
         if(!user){
             throw Error ( `Пользователь ${username} не найден`)
@@ -30,7 +29,7 @@ class UserService {
         const tokens = TokenService.generateTokens(user._id, user.username)
         await TokenService.saveToken(user._id, tokens.refreshToken)
 
-        return { ...tokens, user: user.username}
+        return { ...tokens, username: user.username}
 
     }
 }

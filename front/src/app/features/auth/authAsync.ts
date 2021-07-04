@@ -2,14 +2,18 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../services/api";
 
 
+interface IUserPayload {
+    username: string;
+    password: string;
+}
+
 export const userLogin = createAsyncThunk(
     'auth/login',
-    async(payload, thunkApi) => {
+    async(payload: IUserPayload, thunkApi) => {
         try {
-            // const {login, password} = payload
-            const res = await api.post('/api/auth/login', {payload})
+            const res = await api.post('/api/auth/login', payload)
             console.log("Res login async = ", res)
-            return res
+            return res?.data
         } catch (error) {
             console.log("Error login | auth/authAsync.ts", error)
             // TODO: if access token expiring , should dispatch refreshToken func
@@ -18,12 +22,11 @@ export const userLogin = createAsyncThunk(
     }
 )
 
-export const logout = createAsyncThunk(
+export const userLogout = createAsyncThunk(
     'auth/logout',
     async(payload, thunkApi) => {
         try {
-            // const {login, password} = payload
-            const res = await api.post('/api/auth/logout', {payload})
+            const res = await api.post('/api/auth/logout', payload)
             console.log("Res logout async = ", res)
             return res
         } catch (error) {
@@ -38,7 +41,7 @@ export const refreshToken = createAsyncThunk(
     async(payload, thunkApi) => {
         try {
             // const {login, password} = payload
-            const res = await api.post('/api/auth/refresh', {payload})
+            const res = await api.post('/api/auth/refresh', payload)
             console.log("Res refresh token async = ", res)
             return res
         } catch (error) {
@@ -50,13 +53,12 @@ export const refreshToken = createAsyncThunk(
 
 export const signUp = createAsyncThunk(
     'auth/signup',
-    async(payload, thunkApi) => {
+    async(payload: IUserPayload, thunkApi) => {
         try {
             console.log("Payload in Async signUp = ", payload )
-            // const {login, password} = payload
-            const res = await api.post('/api/auth/registration', {payload})
+            const res = await api.post('/api/auth/registration', payload)
             console.log("Res regestration async = ", res)
-            return res
+            return res?.data
         } catch (error) {
             console.log("Error fetching filesystem | auth/authAsync.ts", error)
             return thunkApi.rejectWithValue(error)

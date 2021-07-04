@@ -33,7 +33,7 @@ app.get('/', (req,res)=> {
 
 async function start () {
     try{
-        // await mongoose.connect(process.env.DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
+        await mongoose.connect(process.env.DB_URL, { useNewUrlParser: true , useUnifiedTopology: true} )
         app.listen(PORT, () => console.log("SERVER WORKING ON PORT ", PORT))
     }catch(e){
         console.log(e)

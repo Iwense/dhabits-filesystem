@@ -8,6 +8,7 @@ body {
     background: rgb(231, 231, 231);
 }
 .app {
+    height: 100vh;
 }
 .modal__wrapper {
     position: absolute;
@@ -56,13 +57,13 @@ body {
 .modal__button:hover {
     background: #918f8f;
 }
-.modal__link__text{
-    color:rgb(46, 118, 121);
+.modal__link__text {
+    color: rgb(46, 118, 121);
     cursor: pointer;
     font-size: 12px;
 }
-.modal__link__text:hover{
-    color:rgb(35, 92, 94)
+.modal__link__text:hover {
+    color: rgb(35, 92, 94);
 }
 .header {
     background: cadetblue;
@@ -86,12 +87,21 @@ body {
 .header__button:hover {
     background: rgb(46, 118, 121);
 }
+.header__user {
+    cursor: pointer;
+    color: rgb(231, 231, 231);
+}
 .main {
+    padding: 12px;
+}
+.sidebar {
     background: #fff;
-    min-width: 500px;
-    width: 500px;
-    min-height: 300px;
+    box-sizing: border-box;
+    min-width: 300px;
+    width: 300px;
+    min-height: calc(100% - 75px);
     padding: 12px 24px;
+    overflow-x: auto;
 }
 .folder {
     display: flex;
@@ -123,10 +133,7 @@ body {
     color: #686868;
     font-size: 16px;
 }
-.extract {
-    padding: 20px;
-}
-.alert__wrapper{
+.alert__wrapper {
     position: absolute;
     width: fit-content;
     bottom: 12px;
@@ -135,10 +142,10 @@ body {
     display: flex;
     flex-direction: column;
 }
-.alert{
+.alert {
     width: fit-content;
     padding: 12px;
     color: #fff;
     border-radius: 4px;
-    margin-top:12px;
+    margin-top: 12px;
 }

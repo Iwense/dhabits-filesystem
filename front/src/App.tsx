@@ -8,157 +8,155 @@ import cookie from "./services/cookieService";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getRootFolder } from "./app/features/filesystem/filesystem.js";
-// import { getUser } from "./app/features/auth/auth.js";
+import { getUser, getUserError, logout } from "./app/features/auth/auth.js";
 import { getRoot } from "./app/features/filesystem/filesystemAsync";
-import { signUp, userLogin } from "./app/features/auth/authAsync";
+import { signUp, userLogin, userLogout } from "./app/features/auth/authAsync";
 
-
-
-export interface ISubmitObject { 
-    login: string;
-    password:string;
+export interface ISubmitObject {
+    username: string;
+    password: string;
 }
 
-const alertsList:Array<IAlertItem> = [{
-    status:'ok',
-    text:'asd',
-}]
+const alertsList: Array<IAlertItem> = [];
 
 const App = () => {
-    // const [folders, setFolders] = useState([]);
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [showSignUpModal, setShowSignUpModal ] = useState<boolean>(false)
-    const folders = useSelector(getRootFolder)
-    // const user =useSelector(getUser) 
-    const user = 'me'
-    const dispatch = useDispatch()
-    const userAccessToken = cookie.get('accessToken')
-    const [alert, setAlert] = useState<boolean>(false)
+    const [showSignUpModal, setShowSignUpModal] = useState<boolean>(false);
+    const [alert, setAlert] = useState<boolean>(false);
 
-    console.log("alertsList" , alertsList)
+    const userAccessToken = cookie.get("accessToken");
+    const folders = useSelector(getRootFolder);
+    const user = useSelector(getUser) || cookie.get("username");
+    const error = useSelector(getUserError);
+    const dispatch = useDispatch();
 
-    const fetch = useCallback(()=> {
-        dispatch(getRoot())
-    }, [dispatch])
+    const fetch = useCallback(() => {
+        dispatch(getRoot());
+    }, [dispatch]);
 
-    useEffect(()=> {
-        // TODO : remove this 
-        cookie.set('accessToken', 'asdasdasd')
-        if(!folders.length) {
-            fetch()
+    useEffect(() => {
+        if (!folders.length) {
+            fetch();
         }
-    }, [folders, fetch])
+    }, [folders, fetch]);
 
     const handleEnterClick = () => {
         setShowModal((prev) => !prev);
     };
 
-    const handleEnterSignUpClick =()=> {
-        setShowSignUpModal(prev => !prev)
-    }
+    const handleEnterSignUpClick = () => {
+        setShowSignUpModal((prev) => !prev);
+    };
 
-    const handleSubmitLoginModal = ({login, password}: ISubmitObject) => {
+    const handleSubmitLoginModal = ({ username, password }: ISubmitObject) => {
         setShowModal(false);
-        //TODO : Check how to give throw parameters
-        dispatch(userLogin())
-        console.log('Login: ', login)
-        console.log('password', password)
+        dispatch(userLogin({ username, password }));
+        error &&
+            alertsList.push({
+                status: "error",
+                text: error,
+            });
     };
 
     useEffect(() => {
-        if(!alert) return 
+        if (!alert) return;
         const alertShowTime = setTimeout(() => {
-            setAlert(false)
-            alertsList.shift()
-        }, 4000)
-    }, [alert, alertsList.length])
+            setAlert(false);
+            alertsList.shift();
+        }, 4000);
+    }, [alert, alertsList.length]);
 
-    const handleSubmitSignUpModal = ({login, password}: ISubmitObject) => {
-        // setShowSignUpModal(false);
-        //TODO
-        // dispatch(signUp())
-        console.log('Login: ', login)
-        console.log('password', password)
-        alertsList.push({ 
-            status: 'ok',
-            text: `Пользователь ${login} успешно создан!`}
-        )
-        setAlert(true)
+    const handleSubmitSignUpModal = ({ username, password }: ISubmitObject) => {
+        setShowSignUpModal(false);
+        dispatch(signUp({ username, password }));
+
+        alertsList.push({
+            status: "ok",
+            text: `Пользователь ${username} успешно создан!`,
+        });
+        setAlert(true);
     };
-
 
     const handleSwitchModal = () => {
         setShowModal(false);
-        setShowSignUpModal(true)
+        setShowSignUpModal(true);
     };
-    
+
+    const handleExitClick = () => {
+        cookie.remove("accessToken");
+        cookie.remove("refreshToken");
+        cookie.remove("username");
+        dispatch(logout());
+    };
+
     return (
         <div className='app'>
-            {alert && <Alert list={alertsList}/>}
+            {alert && <Alert list={alertsList} />}
             {showModal && (
-               <SignInModal onEnterClick={handleEnterClick} onSubmit={(user:ISubmitObject) => handleSubmitLoginModal(user)} onModalLinkClick={handleSwitchModal}/>
+                <SignInModal
+                    onEnterClick={handleEnterClick}
+                    onSubmit={(user: ISubmitObject) =>
+                        handleSubmitLoginModal(user)
+                    }
+                    onModalLinkClick={handleSwitchModal}
+                />
             )}
             {showSignUpModal && (
-                <SignUpModal onEnterClick={handleEnterSignUpClick}  onSubmit={(user:ISubmitObject) => handleSubmitSignUpModal(user)}/>
+                <SignUpModal
+                    onEnterClick={handleEnterSignUpClick}
+                    onSubmit={(user: ISubmitObject) =>
+                        handleSubmitSignUpModal(user)
+                    }
+                />
             )}
             <header className='header'>
                 <h1 className='header__text'>Test for D-Habits</h1>
                 {user && userAccessToken && (
-                    <div>
+                    <div className={"header__user"} onClick={handleExitClick}>
                         <h3>{user}</h3>
                     </div>
                 )}
-                 <button className='header__button' onClick={handleEnterClick}>
-                     Войти
-                    </button>
                 {!user && !userAccessToken && (
-                    <button className='header__button' onClick={handleEnterClick}>
-                     Войти
+                    <button
+                        className='header__button'
+                        onClick={handleEnterClick}
+                    >
+                        Войти
                     </button>
                 )}
-                
             </header>
             {userAccessToken && (
-                 <main className='main'>
-                 {!!folders.length &&
-                     folders.map((item:any, index:number) => {
-                         if (item.hasOwnProperty("children")) {
-                             return (
-                                 <Folder
-                                     key={`Folders-${item?.id} - ${index}`}
-                                     title={item?.title}
-                                     id={item?.id}
-                                 />
-                             );
-                         }
-                         return (
-                             <File
-                                 key={`file-${item?.id} - ${index}`}
-                                 title={item?.title}
-                             />
-                         );
-                     })}
-                </main>
+                <nav className='sidebar'>
+                    {!!folders.length &&
+                        folders.map((item: any, index: number) => {
+                            if (item.hasOwnProperty("children")) {
+                                return (
+                                    <Folder
+                                        key={`Folders-${item?.id} - ${index}`}
+                                        title={item?.title}
+                                        id={item?.id}
+                                    />
+                                );
+                            }
+                            return (
+                                <File
+                                    key={`file-${item?.id} - ${index}`}
+                                    title={item?.title}
+                                />
+                            );
+                        })}
+                </nav>
             )}
 
             {!userAccessToken && (
-                 <section className={"extract"}>
-                    <h3>ВЫ не вошли в систему, чтобы увидеть файловую структуру войдите в свой профиль</h3>
+                <section className={"main"}>
+                    <h3>
+                        Вы не вошли в систему, чтобы увидеть файловую структуру
+                        войдите в свой профиль
+                    </h3>
+                    <p>Тестовый пользователь test / test</p>
                 </section>
             )}
-           
-            <section className={"extract"}>
-                {/* <h3>Extract webpack config functional : </h3>
-                <div>
-                    <p>git version  - {__VERSION__} </p>
-                </div>
-                <div>
-                    <p>commit hash  -  {COMMITHASH} </p>
-                </div>
-                <div>
-                    <p>git branch  -   {BRANCH} </p>
-                </div> */}
-            </section>
         </div>
     );
 };

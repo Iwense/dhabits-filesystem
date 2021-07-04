@@ -20,6 +20,7 @@ export const registration = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
+        console.log("Req.body = ", req.body)
         const {username, password} = req.body
         const userData = await UserService.login(username, password)
         res.cookie('refreshToken', userData.login, {maxAge:cookieMaxAge, httpOnly: true })
